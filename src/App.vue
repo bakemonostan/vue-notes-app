@@ -1,17 +1,49 @@
+<script setup>
+import { ref } from 'vue';
+
+const showModal = ref(false);
+const newNote = ref('');
+const notes = ref([]);
+
+const getRandomColor = () => {
+  return 'hsl(' + Math.floor(Math.random() * 360) + ', 100%, 75%)';
+};
+
+// handler function
+const addNote = () => {
+  notes.value.push({
+    id: Math.floor(Math.random() * 100000),
+    text: newNote.value,
+    date: new Date(),
+    bgColor: getRandomColor(),
+  });
+  showModal.value = false;
+  newNote.value = '';
+};
+</script>
+
 <template>
   <main>
-    <div class="overlay">
+    <div class="overlay" v-if="showModal">
       <div class="modal">
-        <textarea name="note" id="note" cols="30" rows="10"></textarea>
-        <button>Add Note</button>
-        <button class="close">Close</button>
+        <textarea
+          v-model="newNote"
+          name="note"
+          id="note"
+          cols="30"
+          rows="10"
+        ></textarea>
+        <button @click="addNote">Add Note</button>
+        <button class="close" @click="showModal = false">Close</button>
       </div>
     </div>
     <div class="container">
       <header>
         <h1>Notes</h1>
-        <button>+</button>
+        <button @click="showModal = true">+</button>
       </header>
+      {{ notes }}
+
       <div class="cards-container">
         <div class="card">
           <p class="main-text">
@@ -36,6 +68,8 @@
 main {
   height: 100vh;
   width: 100vw;
+  background: white;
+  color: rgb(43, 41, 41);
 }
 
 .container {
@@ -48,6 +82,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: rgb(43, 41, 41);
 }
 
 h1 {

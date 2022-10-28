@@ -4,6 +4,7 @@ import { ref } from 'vue';
 const showModal = ref(false);
 const newNote = ref('');
 const notes = ref([]);
+const errorMsg = ref('');
 
 const getRandomColor = () => {
   return 'hsl(' + Math.floor(Math.random() * 360) + ', 100%, 75%)';
@@ -11,6 +12,9 @@ const getRandomColor = () => {
 
 // handler function
 const addNote = () => {
+  if (newNote.value.length < 10) {
+    return (errorMsg.value = 'Notes must be at least 10 characters long');
+  }
   notes.value.push({
     id: Math.floor(Math.random() * 100000),
     text: newNote.value,
@@ -19,6 +23,7 @@ const addNote = () => {
   });
   showModal.value = false;
   newNote.value = '';
+  errorMsg.value = '';
 };
 </script>
 
@@ -27,12 +32,13 @@ const addNote = () => {
     <div class="overlay" v-if="showModal">
       <div class="modal">
         <textarea
-          v-model="newNote"
+          v-model.trim="newNote"
           name="note"
           id="note"
           cols="30"
           rows="10"
         ></textarea>
+        <p v-if="errorMsg">{{ errorMsg }}</p>
         <button @click="addNote">Add Note</button>
         <button class="close" @click="showModal = false">Close</button>
       </div>
@@ -42,22 +48,18 @@ const addNote = () => {
         <h1>Notes</h1>
         <button @click="showModal = true">+</button>
       </header>
-      {{ notes }}
 
       <div class="cards-container">
-        <div class="card">
+        <div
+          class="card"
+          v-for="note in notes"
+          :key="note.id"
+          :style="{ backgroundColor: note.bgColor }"
+        >
           <p class="main-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente
-            quasi corporis amet perspiciatis, libero est!
+            {{ note.text }}
           </p>
-          <p class="date">04/27/6853</p>
-        </div>
-        <div class="card">
-          <p class="main-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente
-            quasi corporis amet perspiciatis, libero est!
-          </p>
-          <p class="date">04/27/6853</p>
+          <p class="date">{{ note.date.toLocaleDateString('en-us') }}</p>
         </div>
       </div>
     </div>
@@ -156,6 +158,10 @@ header button {
   color: white;
   cursor: pointer;
   margin-top: 15px;
+}
+.modal p {
+  color: rgb(193, 15, 15);
+  font-weight: bold;
 }
 
 .modal .close {
